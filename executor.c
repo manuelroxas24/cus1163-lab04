@@ -14,27 +14,46 @@
  *             Example: {"ls", "-l", NULL} or {"echo", "Hello", NULL}
  * @return Exit status of the command (0=success, non-zero=failure, -1=error)
  */
-int execute_command(char *command, char **args) {
+int execute_command(char *command, char **args) 
+{
     pid_t pid;
     int status;
 
-    // TODO 1: Fork a child process
-    // Use fork() to create a new process
-    // Store the return value in 'pid'
-    // Check if fork failed (pid < 0) and return -1 if so
+    //Fork 
+    pid = fork();
+    if (pid < 0)
+    {
+        perror("fork failed");
+        return -1;
+    }
 
-    // TODO 2: Child process - Execute the command
-    // Check if we're in the child process (pid == 0)
-    // Call execvp(command, args) to transform into the target program
-    // If execvp returns, it failed - print error and exit(1)
-    // CRITICAL: Child must call exit(1), NOT return!
+    //Child Process
+    if (pid == 0)
+    {
+        if(execvp(command,args) == -1)
+        {
+            perror("execvp failed");
+            exit(1);
+        }
+    }
+    //Parent Process
+    else
+    {
+        if(waitpid(pid, &status, 0) == -1)
+        {
+            perror("waitpid failed");
+            return -1;
+        }
 
+        if (WIFEXITED(status)) 
+        {
+            return WEXITSTATUS(status);
+        }
+        else
+        {
+            return -1;
+        }
+    }
 
-    // TODO 3: Parent process - Wait for child to complete
-    // Use waitpid(pid, &status, 0) to wait for the specific child
-    // Check if child exited normally with WIFEXITED(status)
-    // If yes, return the exit code with WEXITSTATUS(status)
-    // Otherwise return -1
-
-    return -1;  // This line should be replaced by your TODO 3 code
+    return -1;  
 }
