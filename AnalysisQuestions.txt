@@ -1,0 +1,15 @@
+1. What happens to a child's memory when exec() is called?
+- When exec is called, the child's memory is overwritten with the new program. It keeps the same PID and other attributes such as environment variables
+but every other aspect of memory is swapped out for the newer version
+
+2. Why do we need both fork() and exec()? Why not one system call?
+- fork() is used to create new child programs that have near identical code to that of their parents. exec() allows us to overwrite these children with newer code
+of our own design. Without fork, the creation of entirely new programs wouldn't be possible and without exec we would not be able to edit and differentiate a child's code from
+it's parent.
+
+3. What happens if you call exec() in the parent process instead of the child?
+- If the parent process calls exec() then that code is completely overwritten and the original version of the parent would be no more. 
+
+4. Why must the child call exit() instead of return after a failed exec()?
+- By calling exit() it allows the process to be terminated properly. Because the child initially has a similar memory to that of the parent, calling return could allow for some of that unnecessary 
+code to keep running when it was only intended for the parent to run it. 
